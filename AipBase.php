@@ -2,6 +2,8 @@
 
 namespace ginkgo\aip;
 
+use Yii;
+
 /**
  * Aip Base 基类
  */
@@ -42,7 +44,8 @@ class AipBase {
      * @param string $apiKey
      * @param string $secretKey
      */
-    public function __construct($appId, $apiKey, $secretKey){
+    public function __construct($appId, $apiKey, $secretKey)
+    {
         $this->appId = trim($appId);
         $this->apiKey = trim($apiKey);
         $this->secretKey = trim($secretKey);
@@ -55,7 +58,8 @@ class AipBase {
      * 连接超时
      * @param int $ms 毫秒
      */
-    public function setConnectionTimeoutInMillis($ms){
+    public function setConnectionTimeoutInMillis($ms)
+    {
         $this->client->setConnectionTimeoutInMillis($ms);
     }
 
@@ -63,7 +67,8 @@ class AipBase {
      * 响应超时
      * @param int $ms 毫秒
      */
-    public function setSocketTimeoutInMillis($ms){
+    public function setSocketTimeoutInMillis($ms)
+    {
         $this->client->setSocketTimeoutInMillis($ms);
     }
 
@@ -74,7 +79,8 @@ class AipBase {
      * @param array $data
      * @param array $headers
      */
-    protected function proccessRequest($url, &$params, &$data, $headers){
+    protected function proccessRequest($url, &$params, &$data, $headers)
+    {
         $params['aipSdk'] = 'php';
         $params['aipSdkVersion'] = $this->version;
     }
@@ -85,7 +91,8 @@ class AipBase {
      * @param  mixed $data
      * @return mixed
      */
-    protected function request($url, $data, $headers=array()){
+    protected function request($url, $data, $headers=array())
+    {
         try{
             $result = $this->validate($url, $data);
             if($result !== true){
@@ -133,7 +140,8 @@ class AipBase {
      * @param  mixed $data
      * @return mixed
      */
-    protected function multi_request($url, $data){
+    protected function multi_request($url, $data)
+    {
         try{
             $params = array();
             $authObj = $this->auth();
@@ -186,7 +194,8 @@ class AipBase {
      * @param  array $data
      * @return mix
      */
-    protected function validate($url, &$data){
+    protected function validate($url, &$data)
+    {
         return true;
     }
 
@@ -195,7 +204,8 @@ class AipBase {
      * @param $content string
      * @return mixed
      */
-    protected function proccessResult($content){
+    protected function proccessResult($content)
+    {
         return json_decode($content, true);
     }
 
@@ -203,7 +213,8 @@ class AipBase {
      * 返回 access token 路径
      * @return string
      */
-    private function getAuthFilePath(){
+    private function getAuthFilePath()
+    {
         return dirname(__FILE__) . DIRECTORY_SEPARATOR . md5($this->apiKey);
     }
 
@@ -212,22 +223,26 @@ class AipBase {
      * @param  array $obj
      * @return void
      */
-    private function writeAuthObj($obj){
+    private function writeAuthObj($obj)
+    {
         if($obj === null || (isset($obj['is_read']) && $obj['is_read'] === true)){
             return;
         }
 
         $obj['time'] = time();
         $obj['is_cloud_user'] = $this->isCloudUser;
-        @file_put_contents($this->getAuthFilePath(), json_encode($obj));
+        Yii::$app->cache->set(['aip', 'content' => 'auth'], json_encode($obj));
+        // @file_put_contents($this->getAuthFilePath(), json_encode($obj));
     }
 
     /**
      * 读取本地缓存
      * @return array
      */
-    private function readAuthObj(){
-        $content = @file_get_contents($this->getAuthFilePath());
+    private function readAuthObj()
+    {
+        // $content = @file_get_contents($this->getAuthFilePath());
+        $content = Yii::$app->cache->get(['aip', 'content' => 'auth']);
         if($content !== false){
             $obj = json_decode($content, true);
             $this->isCloudUser = $obj['is_cloud_user'];
@@ -245,8 +260,8 @@ class AipBase {
      * @param bool $refresh 是否刷新
      * @return array
      */
-    private function auth($refresh=false){
-
+    private function auth($refresh=false)
+    {
         //非过期刷新
         if(!$refresh){
             $obj = $this->readAuthObj();
@@ -289,7 +304,8 @@ class AipBase {
      * @param  array $param 参数
      * @return array
      */
-    private function getAuthHeaders($method, $url, $params=array(), $headers=array()){
+    private function getAuthHeaders($method, $url, $params=array(), $headers=array())
+    {
         
         //不是云的老用户则不用在header中签名 认证
         if($this->isCloudUser === false){
@@ -322,5 +338,4 @@ class AipBase {
 
         return $headers;
     }
-
 }

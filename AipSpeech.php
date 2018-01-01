@@ -5,8 +5,8 @@ namespace ginkgo\aip;
 /**
  * 百度语音
  */
-class AipSpeech extends AipBase{
-
+class AipSpeech extends AipBase
+{
     /**
      * url
      * @var string
