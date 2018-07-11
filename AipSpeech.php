@@ -121,7 +121,7 @@ class AipSpeech extends AipBase
         $file = $name . '.mp3';
         $path = Yii::getAlias('@webroot' . $dir);
         FileHelper::createDirectory($path);
-        file_put_contents($path . $file, $response);
+        file_put_contents($path . $file, $result);
         
         return ['status' => 200, 'url' => $dir . $file];
     }
