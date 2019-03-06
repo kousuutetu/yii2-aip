@@ -102,7 +102,7 @@ class AipSpeech extends AipBase
      * @param  array $options
      * @return array
      */
-    public function synthesis($text, $name, $lang='zh', $ctp=1, $options=array()){
+    public function synthesis($text, $lang='zh', $ctp=1, $options=array()){
         $data = array();
 
         $data['tex'] = $text;
@@ -116,14 +116,8 @@ class AipSpeech extends AipBase
         if(isset($result['err_no'])){
             return ['status' => $result['err_no']];
         }
-
-        $dir = '/audios/';
-        $file = $name . '.mp3';
-        $path = Yii::getAlias('@webroot' . $dir);
-        FileHelper::createDirectory($path);
-        file_put_contents($path . $file, $result);
         
-        return ['status' => 200, 'url' => $dir . $file];
+        return ['status' => 200, 'url' => $result];
     }
 
 }
