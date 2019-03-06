@@ -117,7 +117,7 @@ class AipSpeech extends AipBase
             return ['status' => $result['err_no']];
         }
         
-        return ['status' => 200, 'url' => $result];
+        return ['status' => 200, 'content' => $result];
     }
 
 }
